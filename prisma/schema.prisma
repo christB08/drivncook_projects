@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Franchise {
+  id            Int     @id @default(autoincrement())
+  nom           String
+  adresse       String?
+  droitEntree   Float
+  pourcentageCA Float   @default(4.00)
+
+  contactNom       String
+  contactEmail     String
+  contactTelephone String
+  dateCreation     DateTime @default(now())
+  statut           Statut   @default(ACTIF)
+
+  camions            Camion[]
+  ventes             Vente[]
+  approvisionnements Approvisionnement[]
+
+  utilisateur Utilisateur? //  relation inverse avec Utilisateur
+}
+
+model Camion {
+  id              Int         @id @default(autoincrement())
+  immatriculation String      @unique
+  localisation    String?
+  etat            EtatCamion  @default(DISPONIBLE)
+  franchiseId     Int
+  franchise       Franchise   @relation(fields: [franchiseId], references: [id])
+  entretiens      Entretien[]
+}
+
+model Entretien {
+  id       Int      @id @default(autoincrement())
+  date     DateTime @default(now())
+  type     String // ex: révision, panne, réparation
+  details  String?
+  camionId Int
+  camion   Camion   @relation(fields: [camionId], references: [id])
+}
+
+model Vente {
+  id          Int       @id @default(autoincrement())
+  montant     Float
+  date        DateTime  @default(now())
+  franchiseId Int
+  franchise   Franchise @relation(fields: [franchiseId], references: [id])
+}
+
+model Entrepot {
+  id                 Int                 @id @default(autoincrement())
+  ville              String
+  stockTotal         Int
+  stockUtilise       Int
+  approvisionnements Approvisionnement[]
+}
+
+model Approvisionnement {
+  id          Int      @id @default(autoincrement())
+  franchiseId Int
+  entrepotId  Int
+  quantite    Int
+  obligatoire Boolean
+  date        DateTime @default(now())
+
+  franchise Franchise @relation(fields: [franchiseId], references: [id])
+  entrepot  Entrepot  @relation(fields: [entrepotId], references: [id])
+}
+
+model Utilisateur {
+  id          Int        @id @default(autoincrement())
+  email       String     @unique
+  motDePasse  String
+  role        Role       @default(FRANCHISE)
+  franchiseId Int?       @unique // correction ici
+  franchise   Franchise? @relation(fields: [franchiseId], references: [id])
+}
+
+enum Statut {
+  ACTIF
+  INACTIF
+}
+
+enum EtatCamion {
+  DISPONIBLE
+  EN_PANNE
+  EN_ENTRETIEN
+}
+
+enum Role {
+  ADMIN
+  FRANCHISE
+}
