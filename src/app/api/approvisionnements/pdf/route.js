@@ -12,7 +12,7 @@ export async function GET(req) {
     const franchiseId = searchParams.get("franchiseId")
     const mois = searchParams.get("mois")
 
-    // 🛠️ Filtrage conditionnel
+    //  Filtrage conditionnel
     const whereClause = {}
     if (franchiseId) whereClause.franchiseId = parseInt(franchiseId)
     if (mois) {
@@ -22,7 +22,7 @@ export async function GET(req) {
       whereClause.date = { gte: start, lte: end }
     }
 
-    // 📌 Récupération des approvisionnements
+    //  Récupération des approvisionnements
     const approvisionnements = await prisma.approvisionnement.findMany({
       where: whereClause,
       include: { franchise: true, entrepot: true },
@@ -55,7 +55,7 @@ export async function GET(req) {
     let totalQuantite = 0
     let dataByFranchise = {}
 
-    // 📌 Liste des approvisionnements
+    //  Liste des approvisionnements
     approvisionnements.forEach((a) => {
       totalQuantite += a.quantite
       dataByFranchise[a.franchise.nom] =
@@ -72,7 +72,7 @@ export async function GET(req) {
     doc.moveDown()
     doc.fontSize(14).text(`Total des approvisionnements : ${totalQuantite}`)
 
-    // 📊 Graphique si plusieurs franchises
+    //  Graphique si plusieurs franchises
     if (Object.keys(dataByFranchise).length > 1) {
       const labels = Object.keys(dataByFranchise)
       const data = Object.values(dataByFranchise)
