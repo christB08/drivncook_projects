@@ -11,12 +11,41 @@ model Franchise {
   id            Int     @id @default(autoincrement())
   nom           String
   adresse       String?
+  ville         String?
+  codePostal    String?
+  pays          String?
+
   droitEntree   Float
   pourcentageCA Float   @default(4.00)
 
+  // Infos légales
+  formeJuridique String?
+  siret           String? @unique
+  tvaIntracom     String?
+  capitalSocial   Float?
+
+  // Infos financières
+  iban           String?
+  ribUrl         String?
+
+  // Contact principal
   contactNom       String
   contactEmail     String
   contactTelephone String
+
+  // Contact facturation
+  contactFactNom       String?
+  contactFactEmail     String?
+  contactFactTelephone String?
+
+  // Pièces jointes
+  kbisUrl          String?
+  idCardUrl        String?
+  proofAddressUrl  String?
+
+  // Consentement
+  cguAcceptedAt DateTime?
+
   dateCreation     DateTime @default(now())
   statut           Statut   @default(ACTIF)
 
@@ -24,7 +53,7 @@ model Franchise {
   ventes             Vente[]
   approvisionnements Approvisionnement[]
 
-  utilisateur Utilisateur? //  relation inverse avec Utilisateur
+  utilisateur Utilisateur? // relation inverse avec Utilisateur
 }
 
 model Camion {
@@ -79,7 +108,7 @@ model Utilisateur {
   email       String     @unique
   motDePasse  String
   role        Role       @default(FRANCHISE)
-  franchiseId Int?       @unique // correction ici
+  franchiseId Int?       @unique // un seul compte par franchise
   franchise   Franchise? @relation(fields: [franchiseId], references: [id])
 }
 
